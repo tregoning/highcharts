@@ -7089,8 +7089,8 @@
 
                     axis.hasVisibleSeries = true;
 
-                    // Validate threshold in logarithmic axes
-                    if (axis.isLog && threshold <= 0) {
+                    // Validate threshold in axes of type logarithmic
+                    if (axis.isLog && !axis.isSymLog && threshold <= 0) {
                         threshold = null;
                     }
 
@@ -7135,7 +7135,7 @@
                             axis.threshold = threshold;
                         }
                         // If any series has a hard threshold, it takes precedence
-                        if (!seriesOptions.softThreshold || axis.isLog) {
+                        if (!seriesOptions.softThreshold || (axis.isLog && !axis.isSymLog)) {
                             axis.softThreshold = false;
                         }
                     }
@@ -13869,7 +13869,7 @@
 
                 // For points within the visible range, including the first point outside the
                 // visible range, consider y extremes
-                validValue = y !== null && y !== UNDEFINED && (!yAxis.isLog || (y.length || y > 0));
+                validValue = y !== null && y !== UNDEFINED && (!yAxis.isLog || yAxis.isSymLog || (y.length || y > 0));
                 withinRange = this.getExtremesFromAll || this.options.getExtremesFromAll || this.cropped ||
                     ((xData[i + 1] || x) >= xMin &&    (xData[i - 1] || x) <= xMax);
 
@@ -13952,7 +13952,7 @@
                     if (yBottom === stackThreshold) {
                         yBottom = pick(threshold, yAxis.min);
                     }
-                    if (yAxis.isLog && yBottom <= 0) { // #1200, #1232
+                    if (yAxis.isLog && !yAxis.isSymLog && yBottom <= 0) { // #1200, #1232
                         yBottom = null;
                     }
 

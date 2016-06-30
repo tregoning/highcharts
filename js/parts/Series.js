@@ -667,7 +667,7 @@ Series.prototype = {
 
 			// For points within the visible range, including the first point outside the
 			// visible range, consider y extremes
-			validValue = y !== null && y !== UNDEFINED && (!yAxis.isLog || (y.length || y > 0));
+			validValue = y !== null && y !== UNDEFINED && (!yAxis.isLog || yAxis.isSymLog || (y.length || y > 0));
 			withinRange = this.getExtremesFromAll || this.options.getExtremesFromAll || this.cropped ||
 				((xData[i + 1] || x) >= xMin &&	(xData[i - 1] || x) <= xMax);
 
@@ -750,7 +750,7 @@ Series.prototype = {
 				if (yBottom === stackThreshold) {
 					yBottom = pick(threshold, yAxis.min);
 				}
-				if (yAxis.isLog && yBottom <= 0) { // #1200, #1232
+				if (yAxis.isLog && !yAxis.isSymLog && yBottom <= 0) { // #1200, #1232
 					yBottom = null;
 				}
 

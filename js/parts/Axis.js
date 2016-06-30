@@ -450,8 +450,8 @@ Axis.prototype = {
 
 				axis.hasVisibleSeries = true;
 
-				// Validate threshold in logarithmic axes
-				if (axis.isLog && threshold <= 0) {
+				// Validate threshold in axes of type logarithmic
+				if (axis.isLog && !axis.isSymLog && threshold <= 0) {
 					threshold = null;
 				}
 
@@ -496,7 +496,7 @@ Axis.prototype = {
 						axis.threshold = threshold;
 					}
 					// If any series has a hard threshold, it takes precedence
-					if (!seriesOptions.softThreshold || axis.isLog) {
+					if (!seriesOptions.softThreshold || (axis.isLog && !axis.isSymLog)) {
 						axis.softThreshold = false;
 					}
 				}
