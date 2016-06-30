@@ -109,6 +109,21 @@
         Highcharts;
 
     /**
+     * Symmetric log function. Provides a log function that can handle zeros and negative numbers
+     */
+    function mathSymLog(num) {
+        var retVal;
+        if (num === 0) {
+            retVal = 0;
+        } else if (num < 0) {
+            retVal = Math.log(Math.abs(num)) * -1;
+        } else {
+            retVal = Math.log(num);
+        }
+        return retVal;
+    }
+
+    /**
      * Provide error messages for debugging, with links to online explanation
      */
     function error(code, stop) {
@@ -6999,7 +7014,7 @@
                 //x: 0,
                 //y: 0
             },
-            type: 'linear' // linear, logarithmic or datetime
+            type: 'linear' // linear, logarithmic, symmetricalLog or datetime
             //visible: true
         },
 
@@ -7145,7 +7160,8 @@
             //axis.axisLine = UNDEFINED;
 
             // Shorthand types
-            axis.isLog = type === 'logarithmic';
+            axis.isLog = (type === 'logarithmic' || type === 'symmetricalLog');
+            axis.isSymLog = type === 'symmetricalLog';
             axis.isDatetimeAxis = isDatetimeAxis;
 
             // Flag, if axis is linked to another axis
@@ -7807,6 +7823,7 @@
                 chart = axis.chart,
                 options = axis.options,
                 isLog = axis.isLog,
+                isSymLog = axis.isSymLog,
                 log2lin = axis.log2lin,
                 isDatetimeAxis = axis.isDatetimeAxis,
                 isXAxis = axis.isXAxis,
@@ -7864,8 +7881,8 @@
             }
 
             if (isLog) {
-                if (!secondPass && mathMin(axis.min, pick(axis.dataMin, axis.min)) <= 0) { // #978
-                    error(10, 1); // Can't plot negative values on log axis
+                if (!isSymLog && !secondPass && mathMin(axis.min, pick(axis.dataMin, axis.min)) <= 0) { // #978
+                    error(10, 1); // Can't plot negative values on axis of type 'logarithmic'
                 }
                 // The correctFloat cures #934, float errors on full tens. But it
                 // was too aggressive for #4360 because of conversion back to lin,
@@ -9564,7 +9581,7 @@
     };
 
     Axis.prototype.log2lin = function (num) {
-        return math.log(num) / math.LN10;
+        return mathSymLog(num) / math.LN10;
     };
 
     Axis.prototype.lin2log = function (num) {
@@ -14432,8 +14449,8 @@
                     pointStack,
                     stackValues;
 
-                // Discard disallowed y values for log axes (#3434)
-                if (yAxis.isLog && yValue !== null && yValue <= 0) {
+                // Discard disallowed y values for axes of type 'logarithmic' (#3434)
+                if (yAxis.isLog && !yAxis.isSymLog && yValue !== null && yValue <= 0) {
                     point.y = yValue = null;
                     error(10);
                 }

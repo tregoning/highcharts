@@ -101,7 +101,7 @@ Axis.prototype = {
 			//x: 0,
 			//y: 0
 		},
-		type: 'linear' // linear, logarithmic or datetime
+		type: 'linear' // linear, logarithmic, symmetricalLog or datetime
 		//visible: true
 	},
 
@@ -247,7 +247,8 @@ Axis.prototype = {
 		//axis.axisLine = UNDEFINED;
 
 		// Shorthand types
-		axis.isLog = type === 'logarithmic';
+		axis.isLog = (type === 'logarithmic' || type === 'symmetricalLog');
+		axis.isSymLog = type === 'symmetricalLog';
 		axis.isDatetimeAxis = isDatetimeAxis;
 
 		// Flag, if axis is linked to another axis
@@ -909,6 +910,7 @@ Axis.prototype = {
 			chart = axis.chart,
 			options = axis.options,
 			isLog = axis.isLog,
+			isSymLog = axis.isSymLog,
 			log2lin = axis.log2lin,
 			isDatetimeAxis = axis.isDatetimeAxis,
 			isXAxis = axis.isXAxis,
@@ -966,8 +968,8 @@ Axis.prototype = {
 		}
 
 		if (isLog) {
-			if (!secondPass && mathMin(axis.min, pick(axis.dataMin, axis.min)) <= 0) { // #978
-				error(10, 1); // Can't plot negative values on log axis
+			if (!isSymLog && !secondPass && mathMin(axis.min, pick(axis.dataMin, axis.min)) <= 0) { // #978
+				error(10, 1); // Can't plot negative values on axis of type 'logarithmic'
 			}
 			// The correctFloat cures #934, float errors on full tens. But it
 			// was too aggressive for #4360 because of conversion back to lin,

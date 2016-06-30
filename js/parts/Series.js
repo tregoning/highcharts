@@ -728,8 +728,8 @@ Series.prototype = {
 				pointStack,
 				stackValues;
 
-			// Discard disallowed y values for log axes (#3434)
-			if (yAxis.isLog && yValue !== null && yValue <= 0) {
+			// Discard disallowed y values for axes of type 'logarithmic' (#3434)
+			if (yAxis.isLog && !yAxis.isSymLog && yValue !== null && yValue <= 0) {
 				point.y = yValue = null;
 				error(10);
 			}
